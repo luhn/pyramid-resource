@@ -27,13 +27,7 @@ class Resource:
         # Invoke customer child lookup
         resp = self.get_child(key)
         if resp is not None:
-            if isinstance(resp, tuple):
-                Child, extra = resp
-            elif isinstance(resp, Resource):
-                Child = resp
-                extra = dict()
-            else:
-                raise TypeError('Invalid child type')
+            Child, extra = resp if isinstance(resp, tuple) else (resp, dict())
             return Child(self.request, key, self, **extra)
 
         # Couldn't find anything
