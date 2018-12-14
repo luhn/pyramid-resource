@@ -1,4 +1,3 @@
-from pyramid.location import lineage
 
 
 class Resource:
