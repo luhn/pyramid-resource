@@ -1,10 +1,32 @@
 [[package]]
+category = "dev"
+description = "the modular source code checker: pep8, pyflakes and co"
+name = "flake8"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "3.6.0"
+
+[package.dependencies]
+mccabe = ">=0.6.0,<0.7.0"
+pycodestyle = ">=2.4.0,<2.5.0"
+pyflakes = ">=2.0.0,<2.1.0"
+setuptools = ">=30"
+
+[[package]]
 category = "main"
 description = "Integrated process monitor for developing and reloading daemons."
 name = "hupper"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 version = "1.4.2"
+
+[[package]]
+category = "dev"
+description = "McCabe checker, plugin for flake8"
+name = "mccabe"
+optional = false
+python-versions = "*"
+version = "0.6.1"
 
 [[package]]
 category = "main"
@@ -36,6 +58,22 @@ version = "0.6"
 [package.dependencies]
 PasteDeploy = ">=1.5.0"
 plaster = ">=0.5"
+
+[[package]]
+category = "dev"
+description = "Python style guide checker"
+name = "pycodestyle"
+optional = false
+python-versions = "*"
+version = "2.4.0"
+
+[[package]]
+category = "dev"
+description = "passive checker of Python programs"
+name = "pyflakes"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+version = "2.0.0"
 
 [[package]]
 category = "main"
@@ -103,14 +141,18 @@ version = "4.6.0"
 setuptools = "*"
 
 [metadata]
-content-hash = "09f372729e55c1dd51556fa1c602d7264668aa7156aec3f45385ea09755bd924"
+content-hash = "47089f562bb3953c56dcc9d1d557b01f699acd69e21e8b20659ed90093558a90"
 python-versions = "^3.4"
 
 [metadata.hashes]
+flake8 = ["6a35f5b8761f45c5513e3405f110a86bea57982c3b75b766ce7b65217abe1670", "c01f8a3963b3571a8e6bd7a4063359aff90749e160778e03817cd9b71c9e07d2"]
 hupper = ["0c0083efcd1b777d7c292e7476e36adaaad187bd0f3cd7b48d8f8ab0abf288a3", "eb3778398658a011c96e620adcd73175f306f880a6d86b2ebb6d2a15a74b6b9b"]
+mccabe = ["ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42", "dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"]
 pastedeploy = ["d423fb9d51fdcf853aa4ff43ac7ec469b643ea19590f67488122d6d0d772350a", "fe53697ec2754703096b75d0ba29112b0590b4ce46726fe4f9408fd006e4eefc"]
 plaster = ["215c921a438b5349931fd7df9a5a11a3572947f20f4bc6dd622ac08f1c3ba249", "8351c7c7efdf33084c1de88dd0f422cbe7342534537b553c49b857b12d98c8c3"]
 plaster-pastedeploy = ["71e29b0ab90df8343bca5f0debe4706f0f8147308a78922c8c26e8252809bce4", "c231130cb86ae414084008fe1d1797db7e61dc5eaafb5e755de21387c27c6fae"]
+pycodestyle = ["74abc4e221d393ea5ce1f129ea6903209940c1ecd29e002e8c6933c2b21026e0", "cbc619d09254895b0d12c2c691e237b2e91e9b2ecf5e84c26b35400f93dcfb83", "cbfca99bd594a10f674d0cd97a3d802a1fdef635d4361e1a2658de47ed261e3a"]
+pyflakes = ["9a7662ec724d0120012f6e29d6248ae3727d821bba522a0e6b356eff19126a49", "f661252913bc1dbe7fcfcbf0af0db3f42ab65aabd1a6ca68fe5d466bace94dae"]
 pyramid = ["37c3e1c9eae72817e0365e2a38143543aee8b75240701fa5cb3a1be86c01a1c0", "3d5a6165854237b41ac67ced7697d8a884ab2b97625fabfa41b9e53d91187698"]
 translationstring = ["4ee44cfa58c52ade8910ea0ebc3d2d84bdcad9fa0422405b1801ec9b9a65b72d", "e26c7bf383413234ed442e0980a2ebe192b95e3745288a8fd2805156d27515b4"]
 venusian = ["757162c5f907e18571b6ab41b7673e5bf18cc8715abf8164292eaef4f1610668", "9902e492c71a89a241a18b2f9950bea7e41d025cc8f3af1ea8d8201346f8577d"]
