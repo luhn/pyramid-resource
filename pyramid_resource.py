@@ -16,7 +16,8 @@ class Resource:
         self.request = request
         self.__name__ = name
         self.__parent__ = parent
-        self._extra = kwargs
+        for key, value in kwargs.items():
+            setattr(self, key, value)
 
     def __getitem__(self, key):
         # Default child lookup
@@ -47,7 +48,7 @@ class Resource:
         pass
 
     def __getattr__(self, name):
-        for resource in lineage(self):
-            if name in resource._extra:
-                return resource._extra[name]
-        raise AttributeError('Could not find attribute "{}"'.format(name))
+        if self.__parent__:
+            return getattr(self.__parent__, name)
+        else:
+            raise AttributeError('Could not find attribute "{}"'.format(name))

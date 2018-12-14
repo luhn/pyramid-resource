@@ -55,3 +55,29 @@ def test_custom_lookup_tuple():
     assert sub.__name__ == 'sub'
     assert sub.__parent__ is root
     assert sub.foo == 'bar'
+
+
+def test_getattr():
+    class SubResource(Resource):
+        pass
+
+    class MyResource(Resource):
+        subfoo = 'subbar'
+
+        @property
+        def prop(self):
+            return 'myprop'
+
+    parent = MyResource('request')
+    child = SubResource('request', 'sub', parent, foo='bar')
+    grandchild = SubResource('request', 'sub', child)
+    with pytest.raises(AttributeError):
+        assert parent.foo
+    assert parent.subfoo == 'subbar'
+    assert parent.prop == 'myprop'
+    assert child.foo == 'bar'
+    assert child.subfoo == 'subbar'
+    assert child.prop == 'myprop'
+    assert grandchild.foo == 'bar'
+    assert grandchild.subfoo == 'subbar'
+    assert grandchild.prop == 'myprop'
