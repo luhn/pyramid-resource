@@ -19,6 +19,11 @@ class Resource:
         self._extra = kwargs
 
     def __getitem__(self, key):
+        # Default child lookup
+        Child = self.__children__.get(key)
+        if Child is not None:
+            return Child(self.request, key, self)
+
         # Invoke customer child lookup
         resp = self.get_child(key)
         if resp is not None:
@@ -31,11 +36,6 @@ class Resource:
                 raise TypeError('Invalid child type')
             return Child(self.request, key, self, **extra)
 
-        # Default child lookup
-        Child = self.__children__.get(key)
-        if Child is not None:
-            return Child(self.request, key, self)
-
         # Couldn't find anything
         raise KeyError
 
@@ -47,9 +47,7 @@ class Resource:
         * A Resource subclass
         * A two-tuple of a Resource subclass and a dictionary of extra
             attributes.
-        * ``None``, to fall back to default child lookup.
-
-        You can also raise a KeyError to force the tree lookup to stop.
+        * ``None`` to indicate no child was found.
 
         """
         pass
