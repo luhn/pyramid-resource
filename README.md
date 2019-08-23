@@ -1,24 +1,21 @@
 # pyramid-resource
 
-Pyramid's URL traversal is a powerful feature, but unfortunately Pyramid does
-not provide any framework for creating a resource tree.  Although you can make
-a resource tree using only dicts, this leaves some of the more interesting
-traversal features on the table.  Creating a more functional resource tree is
-relatively easy, but is unnecessary boilerplate that this project aims to
-eliminate.
+Pyramid's URL traversal is a powerful and personally one of my favorite
+features of the framework.  Unfortunately, Pyramid doesn't provide any
+framework or utilities for implementing resource trees.  This project aims to
+reduce the boilerplate necessary for creating feature-full resource trees.
 
 ## Basic usage
 
 First, of course, you need to add `pyramid-resource` to your project using your
 package manager of choice.  e.g.: `pip install pyramid-resource`
 
-Make sure you're familiar with
+Make sure you're familiar with Pyramid's
 [URL traversal](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/traversal.html).
 
-You can create a new resource by subclassing `pyramid_resource.Resource`.  You
-can make a resource the root of the tree by setting it as your root factory.
-For example, here's a simple application that has a resource tree with only
-a root.
+You can create a new resource by subclassing `pyramid_resource.Resource`.  For
+example, here's a simple application that has a resource tree with only a root
+resource.
 
 ```python
 from wsgiref.simple_server import make_server
@@ -66,15 +63,16 @@ You can see the full example
 ## Dynamic resource trees
 
 One of the more interesting features of URL traversal is that trees can be
-created on the fly.  This allows for dynamic traversal trees that can the
+created on the fly.  This allows for dynamic resource trees that can mirror the
 application state, such as objects in a database.
 
-pyramid-resource enables this by providing a `get_child` method for you to
-override.  The method takes in a single key argument and is invoked if no child
-resource can be found in `__children__`.   By default it returns `None`,
-indicating no child resource exists with the given key.  You can also raise a
-KeyError to indicate the same.  You can return a `Resource` subclass and it
-will be used to create a child resource on the fly.
+Dynamic resource trees can be created by implementing a `get_child` method on
+a resource class.  This method should accept a single argument of a URL
+segment and will be called if no child is found in the `__children__` property.
+If the URL segment corresponds to a valid child resource, `get_child` should
+return a resource class and the child resource will be instanciated from that.
+If no corresponding child is found, `None` should be returned or `KeyError`
+raised, and traversal will be halted.
 
 ```python
 class Child(Resource):
@@ -85,13 +83,13 @@ class Root(Resource):
     def get_child(self, key):
         if exists_in_db(key):
             return Child
+        else:
+            return None
 ```
 
-The current request is accessible via `self.request`.
-
 Of course, this isn't particularly useful if you can't attach information to
-the child resource.  `get_child` can also return a two-tuple of a `Resource`
-subclass and a dictionary of attributes that will be attached to the resulting
+the child resource.  `get_child` can also return a two-tuple of a resource
+class and a dictionary of attributes that will be attached to the resulting
 child.
 
 ```python
@@ -105,9 +103,12 @@ class Root(Resource):
             return Child, {'id': key}
 ```
 
-You can access the ID in your view through `context.id`.  **Resources will
-proxy the attributes of their parent**, so `context.id` will also be accessible
-in views further down the tree.
+The object ID will now be accessible via `context.id` in views on the child
+resource.  **Resources will proxy the attributes of their parent**, so
+`context.id` will also be accessible in views further down the tree.
+
+If you need to access the current request in your `get_child` implementations,
+it's available via `self.request`.
 
 ## An example
 
@@ -238,4 +239,4 @@ Developing against pyramid-resource is simple, thanks to Poetry:
 
 The
 [pyramid_traversalwrapper](https://github.com/Pylons/pyramid_traversalwrapper)
-project proxies a location-ignorant resource tree to make it resource aware.
+project proxies a location-ignorant resource tree to make it location-aware.
