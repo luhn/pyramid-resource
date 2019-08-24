@@ -60,6 +60,24 @@ class Root(Resource):
 You can see the full example
 [here](https://github.com/luhn/pyramid-resource/blob/master/examples/02_children.py).
 
+### Name Resolution
+
+For convenience, you can reference children with dotted Python names.  This is
+most useful for referencing child resources that may be defined further down
+the document.  If you use this functionality, **you must run
+`Configurator.scan()` to trigger the resolution.**
+
+```python
+class Root(Resource):
+    __children__ = {
+        'child': '.Child',
+    }
+
+
+class Child(Resource):
+    pass
+```
+
 ## Dynamic resource trees
 
 One of the more interesting features of URL traversal is that trees can be

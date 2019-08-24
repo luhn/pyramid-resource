@@ -1,6 +1,32 @@
+import venusian
+from pyramid.path import caller_package, DottedNameResolver
 
 
-class Resource:
+class ResourceMeta(type):
+    def __new__(cls, name, bases, attrs):
+        Class = type.__new__(cls, name, bases, attrs)
+
+        # If any children are strings, mark for resolution.
+        if any(isinstance(x, str) for x in Class.__children__.values()):
+            package = caller_package()
+            venusian.attach(Class, _resolver_factory(package))
+
+        return Class
+
+
+def _resolver_factory(package):
+    _resolver = DottedNameResolver(package)
+
+    def resolve(scanner, name, obj):
+        children = obj.__children__
+        for name, child in children.items():
+            if isinstance(child, str):
+                children[name] = _resolver.resolve(child)
+
+    return resolve
+
+
+class Resource(metaclass=ResourceMeta):
     """
     A node on the traversal resource tree.  Each node should subclass this
     class.  Chilldren can be defined by overriding ``__children__``.

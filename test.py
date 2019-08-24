@@ -4,6 +4,11 @@ from pyramid.config import Configurator
 from pyramid_resource import Resource
 
 
+def test_resolve_names():
+    class MyResource(Resource):
+        pass
+
+
 def test_default_lookup():
     class SubResource(Resource):
         pass
@@ -161,3 +166,30 @@ def test_get_widget_list(app):
             '/widget/5/',
         ],
     }
+
+
+# Test resolution
+
+
+class ResolverRoot(Resource):
+    __children__ = {
+        'foo': '.ToResolve',
+    }
+
+
+class ToResolve(Resource):
+    pass
+
+
+def test_resolve_children():
+
+    def hello(context, request):
+        return 'Hello world!'
+
+    with Configurator(settings={}) as config:
+        config.set_root_factory(ResolverRoot)
+        config.add_view(hello, context=ToResolve, renderer='string')
+        config.scan()
+    app = _TestApp(config.make_wsgi_app())
+
+    assert app.get('/foo').text == 'Hello world!'
