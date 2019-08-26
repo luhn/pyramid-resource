@@ -1,6 +1,6 @@
 # pyramid-resource
 
-Pyramid's URL traversal is a powerful and personally one of my favorite
+Pyramid's URL traversal is a powerful tool and personally one of my favorite
 features of the framework.  Unfortunately, Pyramid doesn't provide any
 framework or utilities for implementing resource trees.  This project aims to
 reduce the boilerplate necessary for creating feature-full resource trees.
@@ -93,16 +93,16 @@ If no corresponding child is found, `None` should be returned or `KeyError`
 raised, and traversal will be halted.
 
 ```python
-class Child(Resource):
-    pass
-
-
 class Root(Resource):
     def get_child(self, key):
         if exists_in_db(key):
             return Child
         else:
             return None
+
+
+class Child(Resource):
+    pass
 ```
 
 Of course, this isn't particularly useful if you can't attach information to
@@ -111,14 +111,14 @@ class and a dictionary of attributes that will be attached to the resulting
 child.
 
 ```python
-class Child(Resource):
-    pass
-
-
 class Root(Resource):
     def get_child(self, key):
         if exists_in_db(key):
             return Child, {'id': key}
+
+
+class Child(Resource):
+    pass
 ```
 
 The object ID will now be accessible via `context.id` in views on the child
