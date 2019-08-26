@@ -141,18 +141,10 @@ from pyramid.view import view_config
 from pyramid_resource import Resource
 
 
-class Widget(Resource):
-    """
-    A resource representing a widget in the mock database.
-
-    """
-    @reify
-    def widget(self):
-        """
-        Lookup the widget from the database.
-
-        """
-        return self.request.widget_db.find(self.widget_id)
+class Root(Resource):
+    __children__ = {
+        'widget': '.WidgetContainer',
+    }
 
 
 class WidgetContainer(Resource):
@@ -174,10 +166,18 @@ class WidgetContainer(Resource):
             return Widget, {'widget_id': id}
 
 
-class Root(Resource):
-    __children__ = {
-        'widget': WidgetContainer,
-    }
+class Widget(Resource):
+    """
+    A resource representing a widget in the mock database.
+
+    """
+    @reify
+    def widget(self):
+        """
+        Lookup the widget from the database.
+
+        """
+        return self.request.widget_db.find(self.widget_id)
 
 
 @view_config(context=WidgetContainer, renderer='string')
