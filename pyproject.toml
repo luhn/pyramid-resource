@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyramid-resource"
-version = "0.2.0"
+version = "0.3.0"
 description = "A simple base resource class for Pyramid traversal."
 readme = "README.md"
 homepage = "https://github.com/luhn/pyramid-resource"
@@ -8,7 +8,7 @@ repository = "https://github.com/luhn/pyramid-resource"
 authors = ["Theron Luhn <theron@luhn.com>"]
 license = "MIT"
 classifiers = [
-	"Development Status :: 3 - Alpha",
+	"Development Status :: 4 - Beta",
 	"Framework :: Pyramid",
 ]
 
