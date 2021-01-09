@@ -34,5 +34,5 @@ setup(
     py_modules=["pyramid_resource"],
     install_requires=REQUIRES,
     extras_require=EXTRAS_REQUIRE,
-    python_requires=">=3.4,<4.0",
+    python_requires=">=3.6",
 )
