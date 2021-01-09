@@ -6,7 +6,7 @@ from pyramid_resource import Resource
 
 class Root(Resource):
     __children__ = {
-        'child': '.Child',
+        'child': 'Child',
     }
 
 

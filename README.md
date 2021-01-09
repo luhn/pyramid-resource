@@ -67,7 +67,7 @@ Strings will be lazily resolved to a resource in the same module.
 This is useful for putting parent resources above child resources in your code, e.g.:
 
 ```python
-class Parent(Resource):
+class Root(Resource):
     __children__ = {
         'child': 'Child',
     }
