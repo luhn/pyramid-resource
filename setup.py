@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 VERSION = "0.4.0"
 CLASSIFIERS = [
@@ -40,6 +40,7 @@ setup(
     version=VERSION,
     description="A simple base resource class for Pyramid traversal.",
     long_description=long_description,
+    long_description_content_type="text/markdown",
     author="Theron Luhn",
     author_email="theron@luhn.com",
     url="https://github.com/luhn/pyramid-resource",
