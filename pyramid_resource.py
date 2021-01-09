@@ -32,12 +32,13 @@ class Resource(metaclass=ResourceMeta):
     class.  Chilldren can be defined by overriding ``__children__``.
 
     """
+
     request = None
-    __name__ = ''
+    __name__ = ""
     __parent__ = None
     __children__ = dict()
 
-    def __init__(self, request, name='', parent=None, **kwargs):
+    def __init__(self, request, name="", parent=None, **kwargs):
         self.request = request
         self.__name__ = name
         self.__parent__ = parent
