@@ -1,6 +1,6 @@
 from distutils.core import setup
 
-VERSION = "0.3.0"
+VERSION = "0.4.0"
 CLASSIFIERS = [
     "Development Status :: 4 - Beta",
     "Framework :: Pyramid",
