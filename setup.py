@@ -26,7 +26,7 @@ EXTRAS_REQUIRE = {
         "webtest~=2.0",
     ],
     "linting": [
-        "black==20.8b1"
+        "black==20.8b1",
         "flake8~=3.6",
         "isort~=5.7",
     ],
