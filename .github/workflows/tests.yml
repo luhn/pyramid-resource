@@ -25,7 +25,7 @@ jobs:
       - name: Install
         run: pip install .[testing]
       - name: Running tests
-        run: pytest test.py
+        run: pytest tests
 
   lint:
     runs-on: ubuntu-latest
@@ -39,8 +39,8 @@ jobs:
       - name: Install
         run: pip install .[linting]
       - name: Flake8
-        run: flake8 pyramid_resource.py test.py
+        run: flake8 pyramid_resource.py tests
       - name: Black
-        run: black --check pyramid_resource.py test.py
+        run: black --check pyramid_resource.py tests
       - name: isort
-        run: isort --check pyramid_resource.py test.py
+        run: isort --check pyramid_resource.py tests
