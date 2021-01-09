@@ -62,20 +62,30 @@ You can see the full example
 
 ### Name Resolution
 
-For convenience, you can reference children with dotted Python names.  This is
-most useful for referencing child resources that may be defined further down
-the document.  If you use this functionality, **you must run
-`Configurator.scan()` to trigger the resolution.**
+For convenience, you can reference children as strings.
+Strings will be lazily resolved to a resource in the same module.
+This is useful for putting parent resources above child resources in your code, e.g.:
 
 ```python
-class Root(Resource):
+class Parent(Resource):
     __children__ = {
-        'child': '.Child',
+        'child': 'Child',
     }
 
 
 class Child(Resource):
     pass
+```
+
+You can also use `zope.dottedname`-style or `pkg_resource`-style references to resources in other packages, a la
+[Configurator.maybe_dotted](https://pyramid.readthedocs.io/en/1.6-branch/api/config.html#pyramid.config.Configurator.maybe_dotted).
+These will resolve relative to the package of the parent resource.
+
+```python
+class Root(Resource):
+    __children__ = {
+        'widget': '.widget.WidgetResource',
+    }
 ```
 
 ## Dynamic resource trees

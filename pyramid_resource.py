@@ -1,32 +1,7 @@
-import venusian
-from pyramid.path import DottedNameResolver, caller_package
+from pyramid.path import DottedNameResolver
 
 
-class ResourceMeta(type):
-    def __new__(cls, name, bases, attrs):
-        Class = type.__new__(cls, name, bases, attrs)
-
-        # If any children are strings, mark for resolution.
-        if any(isinstance(x, str) for x in Class.__children__.values()):
-            package = caller_package()
-            venusian.attach(Class, _resolver_factory(package))
-
-        return Class
-
-
-def _resolver_factory(package):
-    _resolver = DottedNameResolver(package)
-
-    def resolve(scanner, name, obj):
-        children = obj.__children__
-        for name, child in children.items():
-            if isinstance(child, str):
-                children[name] = _resolver.resolve(child)
-
-    return resolve
-
-
-class Resource(metaclass=ResourceMeta):
+class Resource:
     """
     A node on the traversal resource tree.  Each node should subclass this
     class.  Chilldren can be defined by overriding ``__children__``.
@@ -37,6 +12,7 @@ class Resource(metaclass=ResourceMeta):
     __name__ = ""
     __parent__ = None
     __children__ = dict()
+    _children_resolved = False
 
     def __init__(self, request, name="", parent=None, **kwargs):
         self.request = request
@@ -44,6 +20,26 @@ class Resource(metaclass=ResourceMeta):
         self.__parent__ = parent
         for key, value in kwargs.items():
             setattr(self, key, value)
+        if not self._children_resolved:
+            self.__class__._resolve_children()
+
+    @classmethod
+    def _resolve_children(cls):
+        assert not cls._children_resolved
+        assert cls != Resource
+        cls._children_resolved = True
+
+        module = __import__(cls.__module__)
+        resolver = DottedNameResolver(module)
+
+        to_update = dict()
+        for key, val in cls.__children__.items():
+            if isinstance(val, str):
+                try:
+                    to_update[key] = getattr(module, val)
+                except AttributeError:
+                    to_update[key] = resolver.resolve(val)
+        cls.__children__.update(to_update)
 
     def __getitem__(self, key):
         # Default child lookup

@@ -5,11 +5,6 @@ from webtest import TestApp as _TestApp
 from pyramid_resource import Resource
 
 
-def test_resolve_names():
-    class MyResource(Resource):
-        pass
-
-
 def test_default_lookup():
     class SubResource(Resource):
         pass
