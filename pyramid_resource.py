@@ -1,5 +1,5 @@
 import venusian
-from pyramid.path import caller_package, DottedNameResolver
+from pyramid.path import DottedNameResolver, caller_package
 
 
 class ResourceMeta(type):
