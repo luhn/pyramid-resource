@@ -1,3 +1,5 @@
+from importlib import import_module
+
 from pyramid.path import DottedNameResolver
 
 
@@ -27,9 +29,8 @@ class Resource:
     def _resolve_children(cls):
         assert not cls._children_resolved
         assert cls != Resource
-        cls._children_resolved = True
 
-        module = __import__(cls.__module__)
+        module = import_module(cls.__module__)
         resolver = DottedNameResolver(module)
 
         to_update = dict()
@@ -40,6 +41,7 @@ class Resource:
                 except AttributeError:
                     to_update[key] = resolver.resolve(val)
         cls.__children__.update(to_update)
+        cls._children_resolved = True
 
     def __getitem__(self, key):
         # Default child lookup
