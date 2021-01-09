@@ -253,16 +253,6 @@ The resulting application will behave like this:
 > Hello Widget 2!
 ```
 
-## Hacking
-
-Developing against pyramid-resource is simple, thanks to Poetry:
-
-* [Install Poetry](https://poetry.eustace.io/docs/#installation) if you haven't
-  done so already
-* Clone the repository
-* Run `poetry install`
-* Run the test suite with `make test`
-
 ## Prior art
 
 The
