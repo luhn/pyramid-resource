@@ -18,7 +18,7 @@ CLASSIFIERS = [
     "Programming Language :: Python",
 ]
 
-REQUIRES = ["pyramid>=1.7,<2.0"]
+REQUIRES = ["pyramid>=1.7"]
 
 EXTRAS_REQUIRE = {
     "testing": [
