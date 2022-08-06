@@ -1,8 +1,9 @@
 
-test: lint
-	poetry run pytest test.py
+format:
+	black pyramid_resource.py tests
+	isort pyramid_resource.py tests
 
 lint:
-	poetry run flake8 pyramid_resource.py test.py examples/
-
-.PHONY: test lint
+	flake8 pyramid_resource.py tests
+	black --check pyramid_resource.py tests
+	isort -c pyramid_resource.py tests

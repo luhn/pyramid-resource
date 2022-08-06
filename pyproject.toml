@@ -3,9 +3,5 @@
 line-length = 79
 
 [tool.isort]
-multi_line_output = 3
-include_trailing_comma = true
-force_grid_wrap = 0
-use_parentheses = true
+profile = "black"
 line_length = 79
-known_third_party = ["redis"]  # isort mistakenly thinks redis is a first-party module.
