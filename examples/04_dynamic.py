@@ -41,7 +41,7 @@ class WidgetContainer(Resource):
             raise KeyError
 
         if self.request.widget_db.exists(id):
-            return Widget, {'widget_id': id}
+            return Widget(widget_id=id)
 
 
 class Widget(Resource):

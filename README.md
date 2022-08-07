@@ -107,13 +107,13 @@ class Child(Resource):
 ```
 
 Of course, this isn't particularly useful if you can't attach information to the child resource.
-`get_child` can also return a two-tuple of a resource class and a dictionary of attributes that will be attached to the resulting child.
+You can instantiate a resource with additional data as kwargs and return it from `get_child`:
 
 ```python
 class Root(Resource):
     def get_child(self, key):
         if exists_in_db(key):
-            return Child, {'id': key}
+            return Child(id=key)
 
 
 class Child(Resource):
@@ -159,7 +159,7 @@ class WidgetContainer(Resource):
             raise KeyError
 
         if self.request.widget_db.exists(id):
-            return Widget, {'widget_id': id}
+            return Widget(widget_id=id)
 
 
 class Widget(Resource):

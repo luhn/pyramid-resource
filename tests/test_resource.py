@@ -3,6 +3,47 @@ import pytest
 from pyramid_resource import Resource
 
 
+def test_init():
+    class MyResource(Resource):
+        ...
+
+    r = MyResource("request", "name", "parent")
+    assert r.request == "request"
+    assert r.__name__ == "name"
+    assert r.__parent__ == "parent"
+
+
+def test_init_root():
+    class MyResource(Resource):
+        ...
+
+    r = MyResource("request")
+    assert r.request == "request"
+    assert r.__name__ == ""
+    assert r.__parent__ is None
+
+
+def test_init_direct():
+    with pytest.raises(TypeError) as e:
+        Resource("request")
+    assert str(e.value) == (
+        "Cannot instanciate `Resource` directly; please make a subclass."
+    )
+
+
+def test_attach():
+    class MyResource(Resource):
+        ...
+
+    r = MyResource()
+    assert not r.attached
+    r.attach("request", "name", "parent")
+    assert r.attached
+    assert r.request == "request"
+    assert r.__name__ == "name"
+    assert r.__parent__ == "parent"
+
+
 def test_default_lookup():
     class SubResource(Resource):
         pass
@@ -56,6 +97,53 @@ def test_custom_lookup_tuple():
     assert sub.__name__ == "sub"
     assert sub.__parent__ is root
     assert sub.foo == "bar"
+
+
+def test_custom_lookup_instance():
+    class SubResource(Resource):
+        pass
+
+    class MyResource(Resource):
+        def get_child(self, key):
+            assert key == "sub"
+            return SubResource(foo="bar")
+
+    root = MyResource("request")
+    sub = root["sub"]
+    assert isinstance(sub, SubResource)
+    assert sub.request == "request"
+    assert sub.__name__ == "sub"
+    assert sub.__parent__ is root
+    assert sub.foo == "bar"
+
+
+def test_custom_lookup_none():
+    class SubResource(Resource):
+        pass
+
+    class MyResource(Resource):
+        def get_child(self, key):
+            assert key == "sub"
+            return None
+
+    root = MyResource("request")
+    with pytest.raises(KeyError):
+        root["sub"]
+
+
+def test_custom_lookup_unknown():
+    class SubResource(Resource):
+        pass
+
+    class MyResource(Resource):
+        def get_child(self, key):
+            assert key == "sub"
+            return "foo"
+
+    root = MyResource("request")
+    with pytest.raises(ValueError) as e:
+        root["sub"]
+    assert str(e.value) == "Unexpected return value from `get_child`: 'foo'"
 
 
 def test_getattr():

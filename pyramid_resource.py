@@ -39,17 +39,36 @@ class Resource(metaclass=ResourceMeta):
     __parent__ = None
     __children__ = dict()
 
-    def __init__(self, request, name="", parent=None, **kwargs):
+    def __init__(self, request=None, name="", parent=None, **kwargs):
+        if self.__class__ is Resource:
+            raise TypeError(
+                "Cannot instanciate `Resource` directly; please make a "
+                "subclass."
+            )
+
         if not self._children_resolved:
             raise TypeError(
                 "Cannot instanciate resource, `resolve_children` was never "
                 "invoked."
             )
+        if request is not None:
+            self.attach(request, name, parent)
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def attach(self, request=None, name="", parent=None):
+        if self.attached:
+            raise TypeError(
+                "Cannot attach resource, it has already been attached to a "
+                "request."
+            )
         self.request = request
         self.__name__ = name
         self.__parent__ = parent
-        for key, value in kwargs.items():
-            setattr(self, key, value)
+
+    @property
+    def attached(self):
+        return self.request is not None
 
     @classmethod
     def resolve_children(cls, config):
@@ -70,19 +89,33 @@ class Resource(metaclass=ResourceMeta):
         cls._children_resolved = True
 
     def __getitem__(self, key):
+        if not self.attached:
+            raise ValueError(
+                "Cannot lookup children, resource is not attached to a "
+                "request."
+            )
+
         # Default child lookup
         Child = self.__children__.get(key)
         if Child is not None:
             return Child(self.request, key, self)
 
         # Invoke customer child lookup
-        resp = self.get_child(key)
-        if resp is not None:
-            Child, extra = resp if isinstance(resp, tuple) else (resp, dict())
+        result = self.get_child(key)
+        if result is None:
+            raise KeyError
+        elif isinstance(result, tuple):
+            Child, extra = result
             return Child(self.request, key, self, **extra)
-
-        # Couldn't find anything
-        raise KeyError
+        elif isinstance(result, Resource):
+            result.attach(self.request, key, self)
+            return result
+        elif isinstance(result, type) and issubclass(result, Resource):
+            return result(self.request, key, self)
+        else:
+            raise ValueError(
+                f"Unexpected return value from `get_child`: {result!r}"
+            )
 
     def get_child(self, key):
         """
@@ -98,7 +131,7 @@ class Resource(metaclass=ResourceMeta):
         pass
 
     def __getattr__(self, name):
-        if self.__parent__:
+        if self.__parent__ is not None:
             return getattr(self.__parent__, name)
         else:
             raise AttributeError('Could not find attribute "{}"'.format(name))
