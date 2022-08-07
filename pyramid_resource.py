@@ -1,9 +1,33 @@
-from importlib import import_module
-
-from pyramid.path import DottedNameResolver
+import venusian
 
 
-class Resource:
+class ResourceMeta(type):
+    def __new__(cls, name, bases, dct):
+        obj = super().__new__(cls, name, bases, dct)
+        if bases == tuple():
+            # Skip everything else for base Resource class.
+            return obj
+
+        if _requires_resolution(obj):
+            obj._children_resolved = False
+
+            def resolve(scanner, name, config):
+                obj.resolve_children(scanner.config)
+
+            venusian.attach(obj, resolve, category="pyramid")
+        else:
+            obj._children_resolved = True
+        return obj
+
+
+def _requires_resolution(cls):
+    for value in cls.__children__.values():
+        if isinstance(value, str):
+            return True
+    return False
+
+
+class Resource(metaclass=ResourceMeta):
     """
     A node on the traversal resource tree.  Each node should subclass this
     class.  Chilldren can be defined by overriding ``__children__``.
@@ -14,33 +38,35 @@ class Resource:
     __name__ = ""
     __parent__ = None
     __children__ = dict()
-    _children_resolved = False
 
     def __init__(self, request, name="", parent=None, **kwargs):
+        if not self._children_resolved:
+            raise TypeError(
+                "Cannot instanciate resource, `resolve_children` was never "
+                "invoked."
+            )
         self.request = request
         self.__name__ = name
         self.__parent__ = parent
         for key, value in kwargs.items():
             setattr(self, key, value)
-        if not self._children_resolved:
-            self.__class__._resolve_children()
 
     @classmethod
-    def _resolve_children(cls):
-        assert not cls._children_resolved
-        assert cls != Resource
+    def resolve_children(cls, config):
+        if cls is Resource:
+            raise NotImplementedError(
+                "Cannot run `resolve_children` on base `Resource` object."
+            )
 
-        module = import_module(cls.__module__)
-        resolver = DottedNameResolver(module)
+        # If already resolved, no-op
+        if cls._children_resolved:
+            return
 
-        to_update = dict()
-        for key, val in cls.__children__.items():
+        # We're using list() to create a copy of the item list, to prevent
+        # issues when modifying the dictionary in-place.
+        for key, val in list(cls.__children__.items()):
             if isinstance(val, str):
-                try:
-                    to_update[key] = getattr(module, val)
-                except AttributeError:
-                    to_update[key] = resolver.resolve(val)
-        cls.__children__.update(to_update)
+                cls.__children__[key] = config.maybe_dotted(val)
         cls._children_resolved = True
 
     def __getitem__(self, key):

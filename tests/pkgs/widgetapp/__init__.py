@@ -8,11 +8,12 @@ def includeme(config):
     config.add_view(
         get_widget_id, context=Widget, name="id", renderer="string"
     )
+    Root.resolve_children(config)
 
 
 class Root(Resource):
     __children__ = {
-        "widget": "WidgetContainer",
+        "widget": ".WidgetContainer",
     }
 
 

@@ -62,14 +62,13 @@ You can see the full example
 
 ### Name Resolution
 
-For convenience, you can reference children as strings.
-Strings will be lazily resolved to a resource in the same module.
+For convenience, you can reference children as [dotted name](https://docs.pylonsproject.org/projects/pyramid/en/2.0-branch/glossary.html#term-dotted-Python-name) strings.
 This is useful for putting parent resources above child resources in your code, e.g.:
 
 ```python
 class Root(Resource):
     __children__ = {
-        'child': 'Child',
+        'child': '.Child',
     }
 
 
@@ -77,16 +76,16 @@ class Child(Resource):
     pass
 ```
 
-You can also use `zope.dottedname`-style or `pkg_resource`-style references to resources in other packages, a la
-[Configurator.maybe_dotted](https://pyramid.readthedocs.io/en/1.6-branch/api/config.html#pyramid.config.Configurator.maybe_dotted).
-These will resolve relative to the package of the parent resource.
+For this to properly function, you will need to run [Configurator.scan](https://docs.pylonsproject.org/projects/pyramid/en/2.0-branch/api/config.html#pyramid.config.Configurator.scan) on the module.
+If you prefer not to use `scan`, you can also invoke the resolution manually using `Resource.resolve_children`:
 
 ```python
-class Root(Resource):
-    __children__ = {
-        'widget': '.widget.WidgetResource',
-    }
+def includeme(config):
+    Root.resolve_children(config)
 ```
+
+This functionality resolves strings using [Configurator.maybe_dotted](https://docs.pylonsproject.org/projects/pyramid/en/2.0-branch/api/config.html#pyramid.config.Configurator.maybe_dotted) and will behave the same.
+This means that names *are relative to the configurator,* not necessarily the package that contains the resource.
 
 ## Dynamic resource trees
 

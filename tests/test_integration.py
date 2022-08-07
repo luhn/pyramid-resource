@@ -34,3 +34,10 @@ def test_get_widget_list(widget_app):
             "/widget/5/",
         ],
     }
+
+
+def test_venusian_name_resolution():
+    config = Configurator()
+    config.include("tests.pkgs.venusianresolution")
+    app = _TestApp(config.make_wsgi_app())
+    assert app.get("/child/").text == "Hello World!"
