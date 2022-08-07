@@ -54,7 +54,7 @@ class Root(Resource):
     }
 ```
 
-You can see the full example [here](https://github.com/luhn/pyramid-resource/blob/master/examples/02_children.py).
+You can see the full example [here](https://github.com/luhn/pyramid-resource/blob/master/examples/child_resources.py).
 
 ### Name Resolution
 
@@ -131,15 +131,17 @@ Here's an example that demonstrates how a real application might utilize pyramid
 
 ```python
 from wsgiref.simple_server import make_server
-from pyramid.decorator import reify
+
 from pyramid.config import Configurator
+from pyramid.decorator import reify
 from pyramid.view import view_config
+
 from pyramid_resource import Resource
 
 
 class Root(Resource):
     __children__ = {
-        'widget': '.WidgetContainer',
+        "widget": ".dynamic.WidgetContainer",
     }
 
 
@@ -148,6 +150,7 @@ class WidgetContainer(Resource):
     A resource containing the Widget resources.
 
     """
+
     def get_child(self, key):
         """
         Return a child resource if the widget exists in the database.
@@ -167,6 +170,7 @@ class Widget(Resource):
     A resource representing a widget in the mock database.
 
     """
+
     @reify
     def widget(self):
         """
@@ -176,7 +180,7 @@ class Widget(Resource):
         return self.request.widget_db.find(self.widget_id)
 
 
-@view_config(context=WidgetContainer, renderer='string')
+@view_config(context=WidgetContainer, renderer="string")
 def list_widgets(context, request):
     """
     GET /widget/
@@ -187,10 +191,10 @@ def list_widgets(context, request):
     urls = []
     for widget_id in request.widget_db:
         urls.append(request.resource_path(context[widget_id]))
-    return '\n'.join(urls) + '\n'
+    return "\n".join(urls) + "\n"
 
 
-@view_config(context=Widget, renderer='string')
+@view_config(context=Widget, renderer="string")
 def get_widget(context, request):
     """
     GET /widget/{id}/
@@ -198,7 +202,7 @@ def get_widget(context, request):
     Greet the current widget.
 
     """
-    return 'Hello {}!\n'.format(context.widget)
+    return "Hello {}!\n".format(context.widget)
 
 
 class MockDatabase:
@@ -206,9 +210,10 @@ class MockDatabase:
     An imitation of a widget database.
 
     """
+
     DATA = {
-        1: 'Widget 1',
-        2: 'Widget 2',
+        1: "Widget 1",
+        2: "Widget 2",
     }
 
     def exists(self, id):
@@ -221,17 +226,21 @@ class MockDatabase:
         return iter(self.DATA.keys())
 
 
-if __name__ == '__main__':
-    with Configurator() as config:
-        config.set_root_factory(Root)
-        config.add_request_method(
-            lambda _: MockDatabase(),
-            'widget_db',
-            property=True,
-        )
-        config.scan()
-        app = config.make_wsgi_app()
-    server = make_server('0.0.0.0', 8080, app)
+def make_app():
+    config = Configurator()
+    config.set_root_factory(Root)
+    config.add_request_method(
+        lambda _: MockDatabase(),
+        "widget_db",
+        property=True,
+    )
+    config.scan(".dynamic")
+    return config.make_wsgi_app()
+
+
+if __name__ == "__main__":
+    app = make_app()
+    server = make_server("0.0.0.0", 8080, app)
     server.serve_forever()
 ```
 
