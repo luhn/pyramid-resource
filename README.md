@@ -1,21 +1,19 @@
 # pyramid-resource
 
-Pyramid's URL traversal is a powerful tool and personally one of my favorite
-features of the framework.  Unfortunately, Pyramid doesn't provide any
-framework or utilities for implementing resource trees.  This project aims to
-reduce the boilerplate necessary for creating feature-full resource trees.
+Pyramid's URL traversal is a powerful tool and personally one of my favorite features of the framework.
+Unfortunately, Pyramid doesn't provide any framework or utilities for implementing resource trees.
+This project aims to reduce the boilerplate necessary for creating feature-full resource trees.
 
-## Basic usage
+## Prerequisites
 
-First, of course, you need to add `pyramid-resource` to your project using your
-package manager of choice.  e.g.: `pip install pyramid-resource`
+To use this package, you'll first need to be familiar with Pyramid's [URL traversal](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/traversal.html).
 
-Make sure you're familiar with Pyramid's
-[URL traversal](https://docs.pylonsproject.org/projects/pyramid/en/latest/narr/traversal.html).
+Once you're ready to get started, install pyramid-resource:  `pip install pyramid-resource`
 
-You can create a new resource by subclassing `pyramid_resource.Resource`.  For
-example, here's a simple application that has a resource tree with only a root
-resource.
+## Basic Usage
+
+You can create a new resource by subclassing `pyramid_resource.Resource`.
+For example, here's a simple application that has a resource tree with only a root resource.
 
 ```python
 from wsgiref.simple_server import make_server
@@ -41,10 +39,9 @@ if __name__ == '__main__':
     server.serve_forever()
 ```
 
-You can define child resources by setting the `__children__` property to a
-dictionary.  The key corresponds the URL segment and the value should be a
-resource subclass.  pyramid-resource will automatically make the resources
-location-aware.
+You can define child resources by setting the `__children__` property to a dictionary.
+The key corresponds the URL segment and the value should be a resource subclass.
+pyramid-resource will automatically make the resources location-aware.
 
 ```python
 class Child(Resource):
@@ -57,8 +54,7 @@ class Root(Resource):
     }
 ```
 
-You can see the full example
-[here](https://github.com/luhn/pyramid-resource/blob/master/examples/02_children.py).
+You can see the full example [here](https://github.com/luhn/pyramid-resource/blob/master/examples/02_children.py).
 
 ### Name Resolution
 
@@ -89,17 +85,13 @@ This means that names *are relative to the configurator,* not necessarily the pa
 
 ## Dynamic resource trees
 
-One of the more interesting features of URL traversal is that trees can be
-created on the fly.  This allows for dynamic resource trees that can mirror the
-application state, such as objects in a database.
+One of the more interesting features of URL traversal is that trees can be created on the fly.
+This allows for dynamic resource trees that can mirror the application state, such as objects in a database.
 
-Dynamic resource trees can be created by implementing a `get_child` method on
-a resource class.  This method should accept a single argument of a URL
-segment and will be called if no child is found in the `__children__` property.
-If the URL segment corresponds to a valid child resource, `get_child` should
-return a resource class and the child resource will be instanciated from that.
-If no corresponding child is found, `None` should be returned or `KeyError`
-raised, and traversal will be halted.
+Dynamic resource trees can be created by implementing a `get_child` method on a resource class.
+This method should accept a single argument of a URL segment and will be called if no child is found in the `__children__` property.
+If the URL segment corresponds to a valid child resource, `get_child` should return a resource class and the child resource will be instanciated from that.
+If no corresponding child is found, `None` should be returned or `KeyError` raised, and traversal will be halted.
 
 ```python
 class Root(Resource):
@@ -114,10 +106,8 @@ class Child(Resource):
     pass
 ```
 
-Of course, this isn't particularly useful if you can't attach information to
-the child resource.  `get_child` can also return a two-tuple of a resource
-class and a dictionary of attributes that will be attached to the resulting
-child.
+Of course, this isn't particularly useful if you can't attach information to the child resource.
+`get_child` can also return a two-tuple of a resource class and a dictionary of attributes that will be attached to the resulting child.
 
 ```python
 class Root(Resource):
@@ -130,17 +120,14 @@ class Child(Resource):
     pass
 ```
 
-The object ID will now be accessible via `context.id` in views on the child
-resource.  **Resources will proxy the attributes of their parent**, so
-`context.id` will also be accessible in views further down the tree.
+The object ID will now be accessible via `context.id` in views on the child resource.
+**Resources will proxy the attributes of their parent**, so `context.id` will also be accessible in views further down the tree.
 
-If you need to access the current request in your `get_child` implementations,
-it's available via `self.request`.
+If you need to access the current request in your `get_child` implementations, it's available via `self.request`.
 
-## An example
+## An Example
 
-Here's an example that demonstrates how a real application might utilize
-pyramid-resource.
+Here's an example that demonstrates how a real application might utilize pyramid-resource.
 
 ```python
 from wsgiref.simple_server import make_server
@@ -264,6 +251,4 @@ The resulting application will behave like this:
 
 ## Prior art
 
-The
-[pyramid_traversalwrapper](https://github.com/Pylons/pyramid_traversalwrapper)
-project proxies a location-ignorant resource tree to make it location-aware.
+The [pyramid_traversalwrapper](https://github.com/Pylons/pyramid_traversalwrapper) project proxies a location-ignorant resource tree to make it location-aware.
