@@ -2,6 +2,12 @@ import venusian
 
 
 class ResourceMeta(type):
+    """
+    Metaclass for Resource objects.  This will check if the class requires
+    resolution and if so mark it as such.
+
+    """
+
     def __new__(cls, name, bases, dct):
         obj = super().__new__(cls, name, bases, dct)
         if bases == tuple():
@@ -21,6 +27,11 @@ class ResourceMeta(type):
 
 
 def _requires_resolution(cls):
+    """
+    Return true if a Resource class has children defined with dotted name
+    strings.
+
+    """
     for value in cls.__children__.values():
         if isinstance(value, str):
             return True
@@ -29,8 +40,26 @@ def _requires_resolution(cls):
 
 class Resource(metaclass=ResourceMeta):
     """
-    A node on the traversal resource tree.  Each node should subclass this
-    class.  Chilldren can be defined by overriding ``__children__``.
+    A node on the traversal resource tree.  This is not meant to be used
+    directly but instead subclassed to define new nodes.  Subclasses can
+    declare their children by overriding :prop:`__children__` and/or
+    dynamically load children by overriding :prop:`.
+
+    If a resource is instanciated without a request, it's considered
+    "unattached."  It will need to be attached to a request with :meth:`attach`
+    before it can be used in a resource tree.
+
+    Additional keyword arguments will be set as attributes on the object.
+    Resource objects will proxy the attributes of its parent and ancestors.
+
+    :param request:  The current Pyramid request, or ``None`` to create an
+        "unattached" request.
+    :type request:  :class:`pyramid.request.Request` or ``None``
+    :param name:  The name of the resource node.
+    :type name:  ``str``
+    :param parent:  The parent node.
+    :type parent:  :class:`Resource`
+    :param kwargs:  Additional attributes to set on the class.
 
     """
 
@@ -58,6 +87,13 @@ class Resource(metaclass=ResourceMeta):
             setattr(self, key, value)
 
     def attach(self, request=None, name="", parent=None):
+        """
+        Attach a request to a resource.  A resource must be attached to be used
+        in a resource tree.
+
+        :raises TypeError:  Resource is already been attached to a request.
+
+        """
         if self.attached:
             raise TypeError(
                 "Cannot attach resource, it has already been attached to a "
@@ -73,6 +109,12 @@ class Resource(metaclass=ResourceMeta):
 
     @classmethod
     def resolve_children(cls, config):
+        """
+        Resolve children with dotted-name strings to the referenced objects.
+        If dotted-name strings are being used, this classmethod must be called
+        before instantiating.
+
+        """
         if cls is Resource:
             raise NotImplementedError(
                 "Cannot run `resolve_children` on base `Resource` object."
@@ -123,13 +165,15 @@ class Resource(metaclass=ResourceMeta):
         Override this function to dynamically generate child resources.  You
         can return:
 
-        * A Resource subclass
+        * A Resource subclass.
+        * An unattached Resource instance.
         * A two-tuple of a Resource subclass and a dictionary of extra
-            attributes.
-        * ``None`` to indicate no child was found.
+          attributes.
+        * ``None`` or raise an ``AttributeError`` to indicate no child was
+          found.
 
         """
-        pass
+        ...
 
     def __getattr__(self, name):
         if name.startswith("_"):
@@ -144,6 +188,7 @@ class Resource(metaclass=ResourceMeta):
             try:
                 return getattr(self.__parent__, name)
             except AttributeError:
+                # Ignore this AttributeError because we want to throw our own.
                 ...
 
         type_name = type(self).__name__
