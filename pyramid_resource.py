@@ -40,16 +40,17 @@ class Resource(metaclass=ResourceMeta):
     __children__ = dict()
 
     def __init__(self, request=None, name="", parent=None, **kwargs):
-        if self.__class__ is Resource:
+        if type(self) is Resource:
             raise TypeError(
                 "Cannot instanciate `Resource` directly; please make a "
                 "subclass."
             )
 
         if not self._children_resolved:
+            type_name = type(self).__name__
             raise TypeError(
-                "Cannot instanciate resource, `resolve_children` was never "
-                "invoked."
+                f"Cannot instanciate resource '{type_name}', "
+                "`resolve_children` was never invoked."
             )
         if request is not None:
             self.attach(request, name, parent)
