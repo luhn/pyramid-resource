@@ -152,6 +152,7 @@ def test_getattr():
 
     class MyResource(Resource):
         subfoo = "subbar"
+        _foo = "_bar"
 
         @property
         def prop(self):
@@ -160,13 +161,25 @@ def test_getattr():
     parent = MyResource("request")
     child = SubResource("request", "sub", parent, foo="bar")
     grandchild = SubResource("request", "sub", child)
-    with pytest.raises(AttributeError):
-        assert parent.foo
     assert parent.subfoo == "subbar"
     assert parent.prop == "myprop"
+    with pytest.raises(AttributeError) as exc:
+        assert parent.foo
+    assert str(exc.value) == "'MyResource' object has no attribute 'foo'"
+    assert parent._foo == "_bar"
+
     assert child.foo == "bar"
     assert child.subfoo == "subbar"
     assert child.prop == "myprop"
+    # Don't proxy private attributes
+    with pytest.raises(AttributeError) as exc:
+        assert child._foo
+    assert str(exc.value) == (
+        "'SubResource' object has no attribute '_foo'.  Note: Resource "
+        "objects do not proxy attributes prefixed with an underscore (i.e. "
+        "private attributes)."
+    )
+
     assert grandchild.foo == "bar"
     assert grandchild.subfoo == "subbar"
     assert grandchild.prop == "myprop"

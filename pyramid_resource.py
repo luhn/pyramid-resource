@@ -131,7 +131,19 @@ class Resource(metaclass=ResourceMeta):
         pass
 
     def __getattr__(self, name):
+        if name.startswith("_"):
+            type_name = type(self).__name__
+            raise AttributeError(
+                f"'{type_name}' object has no attribute '{name}'.  Note: "
+                "Resource objects do not proxy attributes prefixed with an "
+                "underscore (i.e. private attributes)."
+            )
+
         if self.__parent__ is not None:
-            return getattr(self.__parent__, name)
-        else:
-            raise AttributeError('Could not find attribute "{}"'.format(name))
+            try:
+                return getattr(self.__parent__, name)
+            except AttributeError:
+                ...
+
+        type_name = type(self).__name__
+        raise AttributeError(f"'{type_name}' object has no attribute '{name}'")
