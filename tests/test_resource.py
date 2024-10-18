@@ -4,8 +4,7 @@ from pyramid_resource import Resource
 
 
 def test_init():
-    class MyResource(Resource):
-        ...
+    class MyResource(Resource): ...
 
     r = MyResource("request", "name", "parent")
     assert r.request == "request"
@@ -14,8 +13,7 @@ def test_init():
 
 
 def test_init_root():
-    class MyResource(Resource):
-        ...
+    class MyResource(Resource): ...
 
     r = MyResource("request")
     assert r.request == "request"
@@ -32,8 +30,7 @@ def test_init_direct():
 
 
 def test_attach():
-    class MyResource(Resource):
-        ...
+    class MyResource(Resource): ...
 
     r = MyResource()
     assert not r.attached

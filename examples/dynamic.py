@@ -12,6 +12,7 @@ An example of how an application might utilize a dynamic resource tree.
 > Hello Widget 2!
 
 """
+
 from wsgiref.simple_server import make_server
 
 from pyramid.config import Configurator

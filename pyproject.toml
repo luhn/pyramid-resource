@@ -2,9 +2,14 @@
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
-[tool.black]
+[tool.ruff]
 line-length = 79
+target-version = "py38"
 
-[tool.isort]
-profile = "black"
-line_length = 79
+[tool.ruff.lint]
+select = [
+	"E",  # flake8
+	"F",  # pyflakes
+	"T20",  # flake8-print
+	"I",   # isort
+]
